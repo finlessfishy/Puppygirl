@@ -4,6 +4,8 @@ local tokenizer = require("tokenizer")
 local parser = require("parser")
 local interpreter = require("interpreter")
 
+local utilities = require("utilities")
+
 
 
 local function run_code(code, intro)
@@ -26,20 +28,25 @@ end
 
 
 
-local code = [[
-	var panda = 16 + 4
-	print panda
-
-	var txt = "texting fox rn"
-	print txt
-	print "ok"
-	print "ok" + 3
-]]
-
-local code2 = [[
-	var luacode = "print('hi')"
-	runlua luacode
-]]
+io.write(".pg script file path: ")
+path = io.read()
+local file, e = io.open(path, "r")
 
 
-run_code(code2)
+
+if not file then
+    print("Error opening file: " .. e)
+    os.exit()
+elseif utilities.endswith(path, ".pg") == false then
+	print("Error, the file you chose isn't a .pg puppygirl script file.")
+	os.exit()
+end
+
+
+
+local code = file:read("*a")
+file:close()
+
+
+
+run_code(code)

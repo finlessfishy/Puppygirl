@@ -1,0 +1,10 @@
+var panda = 16 + 4
+print panda
+
+var txt = "texting fox rn"
+print txt
+print "ok"
+print "ok" + 3
+
+var luacode = "print('hi')"
+runlua luacode
