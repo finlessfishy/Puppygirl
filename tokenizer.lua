@@ -10,8 +10,6 @@ local KEYWORDS = {
     ["while"]     = "KEYWORD_WHILE",
     ["do"]        = "KEYWORD_DO",
     ["for"]       = "KEYWORD_FOR",
-    ["end"]       = "KEYWORD_END",
-}
 }
 
 local tokenizer = {}
