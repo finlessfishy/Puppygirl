@@ -47,12 +47,15 @@ function interpreter.run(ast)
 				print(errorMessage)
 			end
 		elseif node.type == "PythonCode" then
-			info = debug.getinfo(1, "S")
-			lua_dir = info.source:match("@?(.*[/\\])") or "./"
+			py_code = evaluate(node.value)
 
+			local info = debug.getinfo(1, "S")
+			local lua_dir = info.source:match("@?(.*[/\\])") or "./"
 			local full_path = lua_dir .. "runcode.py"
 
-			os.execute("python3 " .. full_path .. '""')
+			py_code = py_code:gsub('"', '\\"')
+
+			os.execute('python3 ' .. full_path .. ' "' .. py_code .. '"')
 		end
 	end
 

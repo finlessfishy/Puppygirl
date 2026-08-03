@@ -1,4 +1,4 @@
-local version = "0.6.6"
+local version = "0.6.7"
 
 local tokenizer = require("tokenizer")
 local parser = require("parser")
@@ -26,10 +26,6 @@ end
 
 
 
---print("output: ", env["panda"]) -- Outputs: panda = 20
-
-
-
 local code = [[
 	var panda = 16 + 4
 	print panda
@@ -40,4 +36,10 @@ local code = [[
 	print "ok" + 3
 ]]
 
-run_code(code)
+local code2 = [[
+	var pycode = "print('hi')"
+	runpython pycode
+]]
+
+
+run_code(code2)

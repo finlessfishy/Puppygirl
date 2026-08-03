@@ -101,6 +101,7 @@ function parser.parse(tokens)
 		local expr = parse_expression()
 
 		return {type = "LuaCode", value = expr}
+	end
 
 	parse_run_python = function()
 		advance()
@@ -108,6 +109,7 @@ function parser.parse(tokens)
 		local expr = parse_expression()
 
 		return {type = "PythonCode", value = expr}
+	end
 
 
 
