@@ -17,6 +17,25 @@ function tokenizer.tokenize(str)
         if c:match("%s") then
             cursor = cursor + 1
 
+        -- Inside tokenizer.tokenize loop, before single-character operators:
+		elseif c == '"' then
+		    cursor = cursor + 1 -- Skip opening quote
+		    local start = cursor
+
+		    -- Scan until closing quote or end of input
+		    while cursor <= len and str:sub(cursor, cursor) ~= '"' do
+		        cursor = cursor + 1
+		    end
+
+		    if cursor > len then
+		        error("Lexing Error: Unterminated string literal")
+		    end
+
+		    local text = str:sub(start, cursor - 1)
+		    cursor = cursor + 1 -- Skip closing quote
+
+		    table.insert(main_table, { type = "STRING", value = text })
+
         -- 2. Numbers
         elseif c:match("%d") then
             local start = cursor

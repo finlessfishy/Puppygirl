@@ -72,7 +72,7 @@ function parser.parse(tokens)
 	parse_primary = function()
 		p = peek()
 
-		if p.type == "NUMBER" then
+		if p.type == "NUMBER" or p.type == "STRING" then
 			advance()
 			return {type = "Literal", value = p.value}
 		elseif p.type == "IDENTIFIER" then
