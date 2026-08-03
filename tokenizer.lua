@@ -3,6 +3,15 @@ local KEYWORDS = {
     ["print"] = "KEYWORD_PRINT",
     ["runlua"] = "KEYWORD_RUN_LUA",
     ["runpython"] = "KEYWORD_RUN_PYTHON",
+    ["if"]        = "KEYWORD_IF",
+    ["then"]      = "KEYWORD_THEN",
+    ["elseif"]    = "KEYWORD_ELSEIF",
+    ["else"]      = "KEYWORD_ELSE",
+    ["while"]     = "KEYWORD_WHILE",
+    ["do"]        = "KEYWORD_DO",
+    ["for"]       = "KEYWORD_FOR",
+    ["end"]       = "KEYWORD_END",
+}
 }
 
 local tokenizer = {}
