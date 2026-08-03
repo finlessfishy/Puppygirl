@@ -48,15 +48,21 @@ function interpreter.run(ast)
 				print(errorMessage)
 			end
 		elseif node.type == "PythonCode" then
-			py_code = evaluate(node.value)
+		    local py_code = evaluate(node.value)
 
-			local info = debug.getinfo(1, "S")
-			local lua_dir = info.source:match("@?(.*[/\\])") or "./"
-			local full_path = lua_dir .. "runcode.py"
+		    local info = debug.getinfo(1, "S")
+		    local lua_dir = info.source:match("@?(.*[/\\])") or "./"
+		    local full_path = lua_dir .. "runcode.py"
 
-			py_code = py_code:gsub('"', '\\"')
+		    local tmp_name = os.tmpname()
+		    local tmp_file = io.open(tmp_name, "w")
+		    tmp_file:write(py_code)
+		    tmp_file:close()
 
-			os.execute('python3 ' .. full_path .. ' "' .. py_code .. '"')
+		    local handle = io.popen('python3 "' .. full_path .. '" "' .. tmp_name .. '"')
+		    io.write(handle:read("*a"))
+		    handle:close()
+    		os.remove(tmp_name)
 		elseif node.type == "IfStatement" then
 			if evaluate(node.condition) then
 				for _, stmt in ipairs(node.then_body) do evaluate(stmt) end
@@ -86,6 +92,13 @@ function interpreter.run(ast)
 				environment[node.var_name] = i
 				for _, stmt in ipairs(node.body) do evaluate(stmt) end
 			end
+		elseif node.type == "InputExpr" then
+		    if node.prompt then
+		        io.write(tostring(evaluate(node.prompt)))
+		    end
+		    return io.read("*l")
+		else
+    		return { type = "ExpressionStatement", value = parse_expression() }
 		end
 	end
 

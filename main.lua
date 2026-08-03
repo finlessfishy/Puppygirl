@@ -49,4 +49,7 @@ file:close()
 
 
 
-run_code(code)
+local ok, result = pcall(run_code, code)
+if not ok then
+    print("Error running script: " .. tostring(result))
+end

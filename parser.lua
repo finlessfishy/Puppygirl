@@ -14,12 +14,14 @@ function parser.parse(tokens)
 		return tokens[cursor-1]
 	end
 
+	-- match()
 	local function match(expected_type)
-		if expected_type == peek().type then
-			return advance()
-		else
-			print("SYNTAX ERROR (match function)")
-		end
+	    if peek() and expected_type == peek().type then
+	        return advance()
+	    else
+	        error("SYNTAX ERROR: expected " .. expected_type .. " but got " ..
+	              (peek() and peek().type or "EOF") .. " at token " .. cursor)
+	    end
 	end
 
 
@@ -111,23 +113,27 @@ function parser.parse(tokens)
 
 
 
+	-- parse_statement(), add an else branch
 	parse_statement = function()
-		local t = peek().type
-		if t == "KEYWORD_VAR" then
-			return parse_variable_declaration()
-		elseif t == "KEYWORD_PRINT" then
-			return parse_print_statement()
-		elseif t == "KEYWORD_RUN_LUA" then
-			return parse_run_lua()
-		elseif t == "KEYWORD_RUN_PYTHON" then
-			return parse_run_python()
-		elseif t == "KEYWORD_IF" then
-			return parse_if()
-		elseif t == "KEYWORD_WHILE" then
-			return parse_while()
-		elseif t == "KEYWORD_FOR" then
-			return parse_for()
-		end
+	    local t = peek().type
+	    if t == "KEYWORD_VAR" then
+	        return parse_variable_declaration()
+	    elseif t == "KEYWORD_PRINT" then
+	        return parse_print_statement()
+	    elseif t == "KEYWORD_RUN_LUA" then
+	        return parse_run_lua()
+	    elseif t == "KEYWORD_RUN_PYTHON" then
+	        return parse_run_python()
+	    elseif t == "KEYWORD_IF" then
+	        return parse_if()
+	    elseif t == "KEYWORD_WHILE" then
+	        return parse_while()
+	    elseif t == "KEYWORD_FOR" then
+	        return parse_for()
+	    else
+	        error("SYNTAX ERROR: unexpected token '" .. tostring(peek().value) ..
+	              "' (" .. t .. ") at token " .. cursor)
+	    end
 	end
 
 	parse_variable_declaration = function()
@@ -172,6 +178,14 @@ function parser.parse(tokens)
 		elseif p.type == "IDENTIFIER" then
 			advance()
 			return { type = "VariableAccess", name = p.value }
+		elseif p.type == "KEYWORD_LISTEN" then
+		    advance()
+		    local prompt = nil
+		    local nxt = peek()
+		    if nxt and (nxt.type == "STRING" or nxt.type == "NUMBER" or nxt.type == "IDENTIFIER") then
+		        prompt = parse_expression()
+		    end
+    		return { type = "InputExpr", prompt = prompt }
 		else
 			print("SYNTAX ERROR (parse_primary function)")
 		end
