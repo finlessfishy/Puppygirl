@@ -24,13 +24,15 @@ function parser.parse(tokens)
 
 
 
-	local parse_statement, parse_variable_declaration, parse_expression, parse_primary
+	local parse_statement, parse_variable_declaration, parse_print_statement, parse_expression, parse_primary
 
 
 
 	parse_statement = function()
 		if peek().type == "KEYWORD_VAR" then
 			return parse_variable_declaration()
+		elseif peek().type == "KEYWORD_PRINT" then
+			return parse_print_statement()
 		end
 	end
 
@@ -79,6 +81,14 @@ function parser.parse(tokens)
 		else
 			print("SYNTAX ERROR (parse_primary function)")
 		end
+	end
+
+	parse_print_statement = function()
+		advance()
+
+		local expr = parse_expression()
+
+		return {type = "PrintStatement", value = expr}
 	end
 
 

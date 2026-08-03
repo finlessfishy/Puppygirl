@@ -30,6 +30,10 @@ function interpreter.run(ast)
 		elseif node.type == "VarDeclaration" then
 			local v = evaluate(node.value)
 			environment[node.name] = v
+		elseif node.type == "PrintStatement" then
+			local value = evaluate(node.value)
+
+			print(value)
 		end
 	end
 
