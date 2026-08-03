@@ -39,7 +39,8 @@ function interpreter.run(ast)
 
 			print(value)
 		elseif node.type == "LuaCode" then
-			local dynamicFunction, errorMessage = load(node.value)
+			local lua_str = evaluate(node.value)
+			local dynamicFunction, errorMessage = load(lua_str)
 
 			if dynamicFunction then
 				dynamicFunction()

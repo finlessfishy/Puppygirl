@@ -1,4 +1,4 @@
-local version = "0.6.7"
+local version = "0.6.8"
 
 local tokenizer = require("tokenizer")
 local parser = require("parser")
@@ -37,8 +37,8 @@ local code = [[
 ]]
 
 local code2 = [[
-	var pycode = "print('hi')"
-	runpython pycode
+	var luacode = "print('hi')"
+	runlua luacode
 ]]
 
 
