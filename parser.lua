@@ -54,7 +54,7 @@ function parser.parse(tokens)
 		local condition = parse_expression()
 		match("KEYWORD_THEN")
 		
-		local then_body = parse_block({"KEYWORD_ELSEIF", "KEYWORD_ELSE", "DOT"})
+		local then_body = parse_block({"KEYWORD_ELSEIF", "KEYWORD_ELSE", "KEYWORD_GOODGIRL"})
 		local elseif_branches = {}
 		local else_body = nil
 
@@ -62,16 +62,16 @@ function parser.parse(tokens)
 			advance() -- consume 'elseif'
 			local cond = parse_expression()
 			match("KEYWORD_THEN")
-			local body = parse_block({"KEYWORD_ELSEIF", "KEYWORD_ELSE", "DOT"})
+			local body = parse_block({"KEYWORD_ELSEIF", "KEYWORD_ELSE", "KEYWORD_GOODGIRL"})
 			table.insert(elseif_branches, { condition = cond, body = body })
 		end
 
 		if peek() and peek().type == "KEYWORD_ELSE" then
 			advance() -- consume 'else'
-			else_body = parse_block({"DOT"})
+			else_body = parse_block({"KEYWORD_GOODGIRL"})
 		end
 
-		match("DOT") -- end block with .
+		match("KEYWORD_GOODGIRL") -- end block with goodgirl
 		return {
 			type = "IfStatement",
 			condition = condition,
@@ -85,8 +85,8 @@ function parser.parse(tokens)
 		advance() -- consume 'while'
 		local condition = parse_expression()
 		match("KEYWORD_DO")
-		local body = parse_block({"DOT"})
-		match("DOT")
+		local body = parse_block({"KEYWORD_GOODGIRL"})
+		match("KEYWORD_GOODGIRL")
 		return { type = "WhileStatement", condition = condition, body = body }
 	end
 
@@ -100,8 +100,8 @@ function parser.parse(tokens)
 		
 		local end_expr = parse_expression()
 		match("KEYWORD_DO")
-		local body = parse_block({"DOT"})
-		match("DOT")
+		local body = parse_block({"KEYWORD_GOODGIRL"})
+		match("KEYWORD_GOODGIRL")
 		return {
 			type = "ForStatement",
 			var_name = var_name,

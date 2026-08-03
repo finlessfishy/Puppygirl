@@ -1,16 +1,17 @@
 local KEYWORDS = {
-	["var"] = "KEYWORD_VAR",
-	["print"] = "KEYWORD_PRINT",
+	["make"] = "KEYWORD_VAR", -- var
+	["woof"] = "KEYWORD_PRINT",
 	["runlua"] = "KEYWORD_RUN_LUA",
 	["runpython"] = "KEYWORD_RUN_PYTHON",
 	["if"]		= "KEYWORD_IF",
 	["then"]	  = "KEYWORD_THEN",
 	["elseif"]	= "KEYWORD_ELSEIF",
 	["else"]	  = "KEYWORD_ELSE",
-	["while"]	 = "KEYWORD_WHILE",
+	["loopy"]	 = "KEYWORD_WHILE",
 	["do"]		= "KEYWORD_DO",
 	["for"]	   = "KEYWORD_FOR",
-	["listen"] = "KEYWORD_LISTEN"
+	["listen"] = "KEYWORD_LISTEN",
+	["goodgirl"] = "KEYWORD_GOODGIRL",
 }
 
 local tokenizer = {}
@@ -87,9 +88,6 @@ function tokenizer.tokenize(str)
 			cursor = cursor + 1
 		elseif c == "*" then
 			table.insert(main_table, { type = "STAR", value = "*" })
-			cursor = cursor + 1
-		elseif c == "." then
-			table.insert(main_table, { type = "DOT", value = "." })
 			cursor = cursor + 1
 		elseif c == "," then
 			table.insert(main_table, { type = "COMMA", value = "," })
