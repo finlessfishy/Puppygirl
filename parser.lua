@@ -25,6 +25,86 @@ function parser.parse(tokens)
 
 
 	local parse_statement, parse_variable_declaration, parse_print_statement, parse_expression, parse_primary, parse_run_lua, parse_run_python
+	local parse_block, parse_if, parse_while, parse_for
+
+
+
+	parse_block = function(stop_tokens)
+		local statements = {}
+
+		while cursor <= #tokens do
+			local t = peek().type
+
+			for _, stop in ipairs(stop_tokens) do
+				if t == stop then
+					return statements
+				end
+			end
+		end
+	end
+
+	parse_if = function()
+		advance() -- consume 'if'
+		local condition = parse_expression()
+		match("KEYWORD_THEN")
+		
+		local then_body = parse_block({"KEYWORD_ELSEIF", "KEYWORD_ELSE", "DOT"})
+		local elseif_branches = {}
+		local else_body = nil
+
+		while peek() and peek().type == "KEYWORD_ELSEIF" do
+			advance() -- consume 'elseif'
+			local cond = parse_expression()
+			match("KEYWORD_THEN")
+			local body = parse_block({"KEYWORD_ELSEIF", "KEYWORD_ELSE", "DOT"})
+			table.insert(elseif_branches, { condition = cond, body = body })
+		end
+
+		if peek() and peek().type == "KEYWORD_ELSE" do
+			advance() -- consume 'else'
+			else_body = parse_block({"DOT"})
+		end
+
+		match("DOT") -- end block with .
+		return {
+			type = "IfStatement",
+			condition = condition,
+			then_body = then_body,
+			elseif_branches = elseif_branches,
+			else_body = else_body
+		}
+	end
+
+	parse_while = function()
+		advance() -- consume 'while'
+		local condition = parse_expression()
+		match("KEYWORD_DO")
+		local body = parse_block({"DOT"})
+		match("DOT")
+		return { type = "WhileStatement", condition = condition, body = body }
+	end
+
+	parse_for = function()
+		advance() -- consume 'for'
+		local var_name = advance().value -- variable identifier
+		match("EQUALS")
+		local start_expr = parse_expression()
+		
+		-- Match comma (if you don't tokenise comma yet, advance or add COMMA token)
+		if peek().value == "," then advance() end 
+		
+		local end_expr = parse_expression()
+		match("KEYWORD_DO")
+		local body = parse_block({"DOT"})
+		match("DOT")
+		return {
+			type = "ForStatement",
+			var_name = var_name,
+			start_expr = start_expr,
+			end_expr = end_expr,
+			body = body
+		}
+	end
 
 
 
@@ -37,6 +117,12 @@ function parser.parse(tokens)
 			return parse_run_lua()
 		elseif peek().type == "KEYWORD_RUN_PYTHON" then
 			return parse_run_python()
+		elseif t == "KEYWORD_IF" then
+			return parse_if()
+		elseif t == "KEYWORD_WHILE" then
+			return parse_while()
+		elseif t == "KEYWORD_FOR" then
+			return parse_for()
 		end
 	end
 

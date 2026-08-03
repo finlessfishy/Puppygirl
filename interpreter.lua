@@ -57,6 +57,36 @@ function interpreter.run(ast)
 			py_code = py_code:gsub('"', '\\"')
 
 			os.execute('python3 ' .. full_path .. ' "' .. py_code .. '"')
+		elseif node.type == "IfStatement" then
+			if evaluate(node.condition) then
+				for _, stmt in ipairs(node.then_body) do evaluate(stmt) end
+			else
+				local handled = false
+				for _, branch in ipairs(node.elseif_branches) do
+					if evaluate(branch.condition) then
+						for _, stmt in ipairs(branch.body) do evaluate(stmt) end
+						handled = true
+						break
+					end
+				end
+				if not handled and node.else_body then
+					for _, stmt in ipairs(node.else_body) do evaluate(stmt) end
+				end
+			end
+
+		elseif node.type == "WhileStatement" then
+			while evaluate(node.condition) do
+				for _, stmt in ipairs(node.body) do evaluate(stmt) end
+			end
+
+		elseif node.type == "ForStatement" then
+			local start_val = evaluate(node.start_expr)
+			local end_val = evaluate(node.end_expr)
+			for i = start_val, end_val do
+				environment[node.var_name] = i
+				for _, stmt in ipairs(node.body) do evaluate(stmt) end
+			end
+		end
 		end
 	end
 
