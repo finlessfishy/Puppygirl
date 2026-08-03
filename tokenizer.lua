@@ -1,6 +1,8 @@
 local KEYWORDS = {
     ["var"] = "KEYWORD_VAR",
-    ["print"] = "KEYWORD_PRINT"
+    ["print"] = "KEYWORD_PRINT",
+    ["runlua"] = "KEYWORD_RUN_LUA",
+    ["runpython"] = "KEYWORD_RUN_PYTHON",
 }
 
 local tokenizer = {}

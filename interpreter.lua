@@ -38,6 +38,21 @@ function interpreter.run(ast)
 			local value = evaluate(node.value)
 
 			print(value)
+		elseif node.type == "LuaCode" then
+			local dynamicFunction, errorMessage = load(node.value)
+
+			if dynamicFunction then
+				dynamicFunction()
+			else
+				print(errorMessage)
+			end
+		elseif node.type == "PythonCode" then
+			info = debug.getinfo(1, "S")
+			lua_dir = info.source:match("@?(.*[/\\])") or "./"
+
+			local full_path = lua_dir .. "runcode.py"
+
+			os.execute("python3 " .. full_path .. '""')
 		end
 	end
 
