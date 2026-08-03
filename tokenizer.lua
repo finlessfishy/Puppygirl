@@ -1,33 +1,67 @@
 local KEYWORDS = {
-	["var"] = "KEYWORD_VAR"
-	["print"] = "KEYWORD_PRINT"
+    ["var"] = "KEYWORD_VAR",
+    ["print"] = "KEYWORD_PRINT"
 }
 
+local tokenizer = {}
 
-function tokenize(string)
-	local tokens = {}
-	local main_table = {}
+function tokenizer.tokenize(str)
+    local main_table = {}
+    local cursor = 1
+    local len = #str
 
-    for t in str:gmatch("%d+|%a+|%p+|%S") do
-        table.insert(tokens, t)
+    while cursor <= len do
+        local c = str:sub(cursor, cursor)
+
+        -- 1. Skip whitespace
+        if c:match("%s") then
+            cursor = cursor + 1
+
+        -- 2. Numbers
+        elseif c:match("%d") then
+            local start = cursor
+            while cursor <= len and str:sub(cursor, cursor):match("%d") do
+                cursor = cursor + 1
+            end
+            local num_str = str:sub(start, cursor - 1)
+            table.insert(main_table, { type = "NUMBER", value = tonumber(num_str) })
+
+        -- 3. Identifiers & Keywords
+        elseif c:match("[%a_]") then
+            local start = cursor
+            while cursor <= len and str:sub(cursor, cursor):match("[%w_]") do
+                cursor = cursor + 1
+            end
+            local word = str:sub(start, cursor - 1)
+            table.insert(main_table, { type = KEYWORDS[word] or "IDENTIFIER", value = word })
+
+        -- 4. Check for == vs =
+        elseif c == "=" then
+            -- Peek at the next character
+            if cursor + 1 <= len and str:sub(cursor + 1, cursor + 1) == "=" then
+                table.insert(main_table, { type = "EQUAL_EQUAL", value = "==" })
+                cursor = cursor + 2 -- Advance past BOTH '=' characters
+            else
+                table.insert(main_table, { type = "EQUALS", value = "=" })
+                cursor = cursor + 1
+            end
+
+        -- 5. Single-character Operators
+        elseif c == "+" then
+            table.insert(main_table, { type = "PLUS", value = "+" })
+            cursor = cursor + 1
+        elseif c == "-" then
+            table.insert(main_table, { type = "MINUS", value = "-" })
+            cursor = cursor + 1
+        elseif c == "*" then
+            table.insert(main_table, { type = "STAR", value = "*" })
+            cursor = cursor + 1
+        else
+            error("Unexpected character: " .. c)
+        end
     end
-
-    for i in tokens do
-    	if tonumber(i) then -- if it's a number
-    		table.insert(main_table, {type = "NUMBER", value = i})
-    	elseif i == "+" then
-    		table.insert(main_table, {type = "PLUS", value = "+"})
-    	elseif i == "-" then
-    		table.insert(main_table, {type = "MINUS", value = "-"})
-    	elseif i == "*" then
-    		table.insert(main_table, {type = "STAR", value = "*"})
-    	elseif i == "=" then
-    		table.insert(main_table, {type = "EQUALS", value = "+"})
-    	else
-    		table.insert(main_table, {type = KEYWORDS[i] or "IDENTIFIER", value = i})
-    	end
-    end
-
 
     return main_table
 end
+
+return tokenizer
