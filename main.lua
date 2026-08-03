@@ -1,4 +1,4 @@
-local version = "0.6.2"
+local version = "0.6.3"
 
 local tokenizer = require("tokenizer")
 local parser = require("parser")
@@ -23,6 +23,7 @@ local function run_code(code, intro)
 
 	return env
 end
+
 
 
 --print("output: ", env["panda"]) -- Outputs: panda = 20

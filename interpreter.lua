@@ -20,9 +20,9 @@ function interpreter.run(ast)
 
 			if node.operator == "+" then
 				if type(leftV) == "STRING" or type(rightV) == "STRING" then
-			        return tostring(leftV) .. tostring(rightV)
-			    end
-			    
+					return tostring(leftV) .. tostring(rightV)
+				end
+
 				return leftV + rightV
 			elseif node.operator == "-" then
 				return leftV - rightV
@@ -42,10 +42,10 @@ function interpreter.run(ast)
 	end
 
 	for _, statement in ipairs(ast) do
-        evaluate(statement)
-    end
+		evaluate(statement)
+	end
 
-    return environment
+	return environment
 end
 
 
