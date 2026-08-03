@@ -2,7 +2,6 @@
  A new coding language, coded mainly in Lua
 
 Puppygirl is a new programming language, with its syntax inspired by languages like Python and Lua.
-
 Puppygirl is made primarily for creating terminal and CLI video games.
 
 
