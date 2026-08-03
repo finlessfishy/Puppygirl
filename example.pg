@@ -1,10 +1,20 @@
-var panda = 16 + 4
-print panda
+var i = 1
+while i == 1 do
+	print "looping once"
+	var i = 2
+.
 
-var txt = "texting fox rn"
-print txt
-print "ok"
-print "ok" + 3
+if i == 2 then
+	print "i is 2!"
+	if i == 2 then
+		print "i is 2!"
+	.
+elseif i == 3 then
+	print "i is 3!"
+else
+	print "something else"
+.
 
-var luacode = "print('hi')"
-runlua luacode
+for x = 1, 3 do
+	print x
+.
