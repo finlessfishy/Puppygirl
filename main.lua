@@ -1,8 +1,11 @@
 local tokenizer = require("tokenizer")
 local parser = require("parser")
+local interpreter = require("interpreter")
 
-local result = tokenizer.tokenize("var panda = 16")
+local code = "var panda = 16 + 4"
 
-for _, token in ipairs(result) do
-    print(token.type, token.value)
-end
+local tokens = tokenizer.tokenize(code)
+local ast = parser.parse(tokens)
+local env = interpreter.run(ast)
+
+print("output: ", env["panda"]) -- Outputs: panda = 20 !
