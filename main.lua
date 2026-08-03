@@ -1,4 +1,4 @@
-local version = "0.6.3"
+local version = "0.6.4"
 
 local tokenizer = require("tokenizer")
 local parser = require("parser")
@@ -37,6 +37,7 @@ local code = [[
 	var txt = "texting fox rn"
 	print txt
 	print "ok"
+	print "ok" + 3
 ]]
 
 run_code(code)
