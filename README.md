@@ -1,4 +1,4 @@
-# puppygirl
+# Puppygirl
 Puppygirl is a new programming language coded mainly in Lua, with its syntax inspired by languages like Python and Lua.
 Puppygirl is built primarily for creating terminal and CLI video games.
 
