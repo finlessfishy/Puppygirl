@@ -90,6 +90,9 @@ function tokenizer.tokenize(str)
 		elseif c == "." then
 			table.insert(main_table, { type = "DOT", value = "." })
 			cursor = cursor + 1
+		elseif c == "," then
+			table.insert(main_table, { type = "COMMA", value = "," })
+			cursor = cursor + 1
 		else
 			error("Unexpected character: " .. c)
 		end

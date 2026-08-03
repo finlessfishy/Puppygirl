@@ -40,7 +40,11 @@ function parser.parse(tokens)
 					return statements
 				end
 			end
+
+			table.insert(statements, parse_statement())
 		end
+
+		return statements
 	end
 
 	parse_if = function()
@@ -90,8 +94,7 @@ function parser.parse(tokens)
 		match("EQUALS")
 		local start_expr = parse_expression()
 		
-		-- Match comma (if you don't tokenise comma yet, advance or add COMMA token)
-		if peek().value == "," then advance() end 
+		match("COMMA")
 		
 		local end_expr = parse_expression()
 		match("KEYWORD_DO")
@@ -109,13 +112,14 @@ function parser.parse(tokens)
 
 
 	parse_statement = function()
-		if peek().type == "KEYWORD_VAR" then
+		local t = peek().type
+		if t == "KEYWORD_VAR" then
 			return parse_variable_declaration()
-		elseif peek().type == "KEYWORD_PRINT" then
+		elseif t == "KEYWORD_PRINT" then
 			return parse_print_statement()
-		elseif peek().type == "KEYWORD_RUN_LUA" then
+		elseif t == "KEYWORD_RUN_LUA" then
 			return parse_run_lua()
-		elseif peek().type == "KEYWORD_RUN_PYTHON" then
+		elseif t == "KEYWORD_RUN_PYTHON" then
 			return parse_run_python()
 		elseif t == "KEYWORD_IF" then
 			return parse_if()

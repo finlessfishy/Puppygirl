@@ -87,7 +87,6 @@ function interpreter.run(ast)
 				for _, stmt in ipairs(node.body) do evaluate(stmt) end
 			end
 		end
-		end
 	end
 
 	for _, statement in ipairs(ast) do
