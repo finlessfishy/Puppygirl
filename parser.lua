@@ -60,7 +60,7 @@ function parser.parse(tokens)
 			table.insert(elseif_branches, { condition = cond, body = body })
 		end
 
-		if peek() and peek().type == "KEYWORD_ELSE" do
+		if peek() and peek().type == "KEYWORD_ELSE" then
 			advance() -- consume 'else'
 			else_body = parse_block({"DOT"})
 		end
