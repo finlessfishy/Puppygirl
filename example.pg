@@ -1,22 +1,22 @@
-var i = 1
-while i == 1 do
-	print "looping once"
-	var i = 2
-.
+make i = 1
+loopy i == 1 do
+	woof "looping once"
+	make i = 2
+goodgirl
 
 if i == 2 then
-	print "i is 2!"
+	woof "i is 2!"
 	if i == 2 then
-		print "i is 2!"
-	.
+		woof "i is 2!"
+	goodgirl
 elseif i == 3 then
-	print "i is 3!"
+	woof "i is 3!"
 else
-	print "something else"
-.
+	woof "something else"
+goodgirl
 
 for x = 1, 3 do
-	print x
-.
+	woof x
+goodgirl
 
 runpython "print('evil')"
