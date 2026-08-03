@@ -6,7 +6,17 @@ local interpreter = require("interpreter")
 
 
 
-local function run_code(code)
+local function run_code(code, intro)
+	if intro == nil then
+		intro = true
+	end
+
+	if intro == true then
+		print("Running puppygirl " .. version)
+	end
+
+
+
 	local tokens = tokenizer.tokenize(code)
 	local ast = parser.parse(tokens)
 	local env = interpreter.run(ast)
