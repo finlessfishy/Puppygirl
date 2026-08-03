@@ -19,7 +19,7 @@ function interpreter.run(ast)
 			local rightV = evaluate(node.right)
 
 			if node.operator == "+" then
-				if type(leftV) == "STRING" or type(rightV) == "STRING" then
+				if type(leftV) == "string" or type(rightV) == "string" then
 					return tostring(leftV) .. tostring(rightV)
 				end
 
