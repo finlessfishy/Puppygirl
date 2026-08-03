@@ -1,4 +1,4 @@
-local version = "0.9.1"
+local version = "0.9.2"
 
 local tokenizer = require("tokenizer")
 local parser = require("parser")
@@ -54,17 +54,17 @@ end
 
 
 
-io.write(".pg script file path: ")
+io.write("Enter your .pg script file path! ")
 path = io.read()
 local file, e = io.open(path, "r")
 
 
 
 if not file then
-    print("Error opening file: " .. e)
+    print("I got an error opening your file! Here's the error: " .. e)
     os.exit()
 elseif utilities.endswith(path, ".pg") == false then
-	print("Error, the file you chose isn't a .pg puppygirl script file.")
+	print("I got an error, the file you chose isn't a .pg puppygirl script file!!")
 	os.exit()
 end
 
@@ -77,5 +77,5 @@ file:close()
 
 local ok, result = pcall(run_code, code)
 if not ok then
-    print("Error running script: " .. tostring(result))
+    print("Oh no, I got an error running your script! Here: " .. tostring(result))
 end

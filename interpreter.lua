@@ -12,7 +12,7 @@ function interpreter.run(ast)
 			if environment[node.name] ~= nil then
 				return environment[node.name]
 			else
-				error("Runtime Error: Undefined variable '" .. node.name .. "'")
+				error("Oh no, an error!!! Your variable isn't defined! '" .. node.name .. "'")
 			end
 		elseif node.type == "BinaryExpr" then
 			local leftV = evaluate(node.left)

@@ -19,8 +19,8 @@ function parser.parse(tokens)
 	    if peek() and expected_type == peek().type then
 	        return advance()
 	    else
-	        error("SYNTAX ERROR: expected " .. expected_type .. " but got " ..
-	              (peek() and peek().type or "EOF") .. " at token " .. cursor)
+	        error("I got confused around token" .. cursor .. ".. I expected " .. expected_type .. ", but I got " ..
+	              (peek() and peek().type or "EOF") .. "...")
 	    end
 	end
 
@@ -131,8 +131,8 @@ function parser.parse(tokens)
 	    elseif t == "KEYWORD_FOR" then
 	        return parse_for()
 	    else
-	        error("SYNTAX ERROR: unexpected token '" .. tostring(peek().value) ..
-	              "' (" .. t .. ") at token " .. cursor)
+	        error("Oops! I found an unexpected token!! '" .. tostring(peek().value) ..
+	              "' (" .. t .. "), and I think it was at token " .. cursor .. "!")
 	    end
 	end
 
@@ -148,7 +148,7 @@ function parser.parse(tokens)
 
 			return {type = "VarDeclaration", name = identifier.value, value = expr}
 		else
-			print("SYNTAX ERROR (parse_variable_declaration function)")
+			print("Oh noo, I got a syntax error!!!!")
 		end
 	end
 
@@ -187,7 +187,7 @@ function parser.parse(tokens)
 		    end
     		return { type = "InputExpr", prompt = prompt }
 		else
-			print("SYNTAX ERROR (parse_primary function)")
+			print("Oopsies, a syntax error!")
 		end
 	end
 

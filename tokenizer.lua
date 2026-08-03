@@ -38,7 +38,7 @@ function tokenizer.tokenize(str)
 			end
 
 			if cursor > len then
-				error("Lexing Error: Unterminated string literal")
+				error("Oh no, I got a Lexing Error: Unterminated string literal. Whatever that means!!")
 			end
 
 			local text = str:sub(start, cursor - 1)
@@ -95,7 +95,7 @@ function tokenizer.tokenize(str)
 			table.insert(main_table, { type = "COMMA", value = "," })
 			cursor = cursor + 1
 		else
-			error("Unexpected character: " .. c)
+			error("I found an unexpected character!! Here it is: " .. c)
 		end
 	end
 
