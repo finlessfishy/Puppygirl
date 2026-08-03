@@ -1,2 +1,2 @@
 # puppygirl
- A new coding language, coded in Python and Lua
+ A new coding language, coded in Lua and Python
