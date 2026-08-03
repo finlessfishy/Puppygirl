@@ -5,4 +5,8 @@ Puppygirl (stylized "puppygirl") is a new programming language, with its syntax 
 
 
 
+**As of v0.9.0, the puppygirl language is Turing complete!**
+
+
+
 GPL-3.0 license
