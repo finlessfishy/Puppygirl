@@ -1,4 +1,4 @@
-local version = "0.7.0"
+local version = "0.8.1"
 
 local tokenizer = require("tokenizer")
 local parser = require("parser")
