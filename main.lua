@@ -1,3 +1,5 @@
+local version = "0.5.0"
+
 local tokenizer = require("tokenizer")
 local parser = require("parser")
 local interpreter = require("interpreter")
