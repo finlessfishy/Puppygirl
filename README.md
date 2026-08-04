@@ -9,6 +9,8 @@ Its syntax is very cute and cheerful, such as "woof" instead of print, and "good
 ### Syntax guide
 - `make` (for creating a variable)
 - `woof` (print)
+- `yep` (true)
+- `nope` (false)
 - `if` (if statement)
 - `else` (else statement)
 - `elseif` (elseif statement)
