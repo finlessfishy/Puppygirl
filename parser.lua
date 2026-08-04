@@ -175,6 +175,12 @@ function parser.parse(tokens)
 		if p.type == "NUMBER" or p.type == "STRING" then
 			advance()
 			return {type = "Literal", value = p.value}
+		elseif p.type == "KEYWORD_TRUE" then
+			advance()
+			return {type = "Literal", value = true}
+		elseif p.type == "KEYWORD_FALSE" then
+			advance()
+			return {type = "Literal", value = false}
 		elseif p.type == "IDENTIFIER" then
 			advance()
 			return { type = "VariableAccess", name = p.value }

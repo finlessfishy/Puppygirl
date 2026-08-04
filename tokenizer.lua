@@ -12,6 +12,8 @@ local KEYWORDS = {
 	["everytime"]	   = "KEYWORD_FOR",
 	["listen"] = "KEYWORD_LISTEN",
 	["goodgirl"] = "KEYWORD_GOODGIRL",
+	["yep"] = "KEYWORD_TRUE",
+	["nope"] = "KEYWORD_FALSE",
 }
 
 local tokenizer = {}
