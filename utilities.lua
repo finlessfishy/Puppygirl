@@ -25,4 +25,14 @@ end
 
 
 
+function clear()
+    if package.config:sub(1,1) == '\\' then
+        os.execute("cls")
+    else
+        os.execute("clear")
+    end
+end
+
+
+
 return utilities
