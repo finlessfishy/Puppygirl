@@ -21,4 +21,14 @@ goodgirl
 
 runpython "print('evil')"
 
+
+
+make is_happy = yip
+
+if is_happy then
+	woof "tail wags!!"
+goodgirl
+
+
+
 goodgirl
