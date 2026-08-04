@@ -1,5 +1,5 @@
 make i = 1
-loopy i == 1 do
+again i == 1 do
 	woof "looping once"
 	make i = 2
 goodgirl

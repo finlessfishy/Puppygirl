@@ -7,9 +7,9 @@ local KEYWORDS = {
 	["then"]	  = "KEYWORD_THEN",
 	["elseif"]	= "KEYWORD_ELSEIF",
 	["else"]	  = "KEYWORD_ELSE",
-	["loopy"]	 = "KEYWORD_WHILE",
+	["again"]	 = "KEYWORD_WHILE",
 	["do"]		= "KEYWORD_DO",
-	["for"]	   = "KEYWORD_FOR",
+	["everytime"]	   = "KEYWORD_FOR",
 	["listen"] = "KEYWORD_LISTEN",
 	["goodgirl"] = "KEYWORD_GOODGIRL",
 }

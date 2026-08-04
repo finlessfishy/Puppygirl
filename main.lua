@@ -6,6 +6,8 @@ local interpreter = require("interpreter")
 
 local utilities = require("utilities")
 
+local ascii_library = require("ascii_library")
+
 
 
 local function run_code(code, intro)
@@ -73,7 +75,7 @@ end
 local code = file:read("*a")
 file:close()
 
-
+print(ascii_library.pg)
 
 local ok, result = pcall(run_code, code)
 if not ok then
