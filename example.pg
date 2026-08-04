@@ -20,3 +20,5 @@ everytime x = 1, 3 do
 goodgirl
 
 runpython "print('evil')"
+
+goodgirl

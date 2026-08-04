@@ -217,13 +217,19 @@ function parser.parse(tokens)
 
 
 
-
-
 	local ast = {}
+
 	while cursor <= #tokens do
+	    if peek().type == "KEYWORD_GOODGIRL" then
+	        if cursor == #tokens then
+	            advance()
+	            return ast
+	        end
+	    end
 	    table.insert(ast, parse_statement())
 	end
-	return ast
+	
+	error("Oh no! Your script didn't end with a goodgirl! Every good script deserves praise after working so hard!!")
 end
 
 return parser
