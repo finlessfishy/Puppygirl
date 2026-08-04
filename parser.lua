@@ -26,7 +26,7 @@ function parser.parse(tokens)
 
 
 
-	local parse_statement, parse_variable_declaration, parse_print_statement, parse_expression, parse_primary, parse_run_lua, parse_run_python
+	local parse_statement, parse_variable_declaration, parse_print_statement, parse_expression, parse_primary, parse_run_python
 	local parse_block, parse_if, parse_while, parse_for
 
 
@@ -120,8 +120,6 @@ function parser.parse(tokens)
 	        return parse_variable_declaration()
 	    elseif t == "KEYWORD_PRINT" then
 	        return parse_print_statement()
-	    elseif t == "KEYWORD_RUN_LUA" then
-	        return parse_run_lua()
 	    elseif t == "KEYWORD_RUN_PYTHON" then
 	        return parse_run_python()
 	    elseif t == "KEYWORD_IF" then
@@ -203,14 +201,6 @@ function parser.parse(tokens)
 		local expr = parse_expression()
 
 		return {type = "PrintStatement", value = expr}
-	end
-
-	parse_run_lua = function()
-		advance()
-
-		local expr = parse_expression()
-
-		return {type = "LuaCode", value = expr}
 	end
 
 	parse_run_python = function()

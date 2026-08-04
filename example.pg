@@ -23,11 +23,13 @@ runpython "print('evil')"
 
 
 
-make is_happy = yip
+make is_happy = yep
 
 if is_happy then
 	woof "tail wags!!"
 goodgirl
+
+runpython "import os; os.system('echo hi')"
 
 
 

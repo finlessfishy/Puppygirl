@@ -2,6 +2,34 @@ local interpreter = {}
 
 
 
+local function collect_python_code(ast, found)
+    found = found or {}
+    for _, node in ipairs(ast) do
+        if node.type == "PythonCode" then
+            if node.value.type == "Literal" then
+                table.insert(found, tostring(node.value.value))
+            end
+        elseif node.type == "IfStatement" then
+            collect_python_code(node.then_body, found)
+            for _, branch in ipairs(node.elseif_branches) do
+                collect_python_code(branch.body, found)
+            end
+            if node.else_body then
+                collect_python_code(node.else_body, found)
+            end
+        elseif node.type == "WhileStatement" then
+            collect_python_code(node.body, found)
+        elseif node.type == "ForStatement" then
+            collect_python_code(node.body, found)
+        end
+    end
+    return found
+end
+
+interpreter.collect_python_code = collect_python_code
+
+
+
 function interpreter.run(ast)
 	local environment = {}
 
@@ -38,15 +66,6 @@ function interpreter.run(ast)
 			local value = evaluate(node.value)
 
 			print(value)
-		elseif node.type == "LuaCode" then
-			local lua_str = evaluate(node.value)
-			local dynamicFunction, errorMessage = load(lua_str)
-
-			if dynamicFunction then
-				dynamicFunction()
-			else
-				print(errorMessage)
-			end
 		elseif node.type == "PythonCode" then
 		    local py_code = evaluate(node.value)
 
@@ -59,10 +78,12 @@ function interpreter.run(ast)
 		    tmp_file:write(py_code)
 		    tmp_file:close()
 
-		    local handle = io.popen('python3 "' .. full_path .. '" "' .. tmp_name .. '"')
-		    io.write(handle:read("*a"))
+		    local handle = io.popen('python3 -u "' .. full_path .. '" run "' .. tmp_name .. '"')
+		    for line in handle:lines() do
+		        print(line)
+		    end
 		    handle:close()
-    		os.remove(tmp_name)
+		    os.remove(tmp_name)
 		elseif node.type == "IfStatement" then
 			if evaluate(node.condition) then
 				for _, stmt in ipairs(node.then_body) do evaluate(stmt) end

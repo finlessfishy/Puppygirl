@@ -1,7 +1,6 @@
 local KEYWORDS = {
 	["make"] = "KEYWORD_VAR", -- var
 	["woof"] = "KEYWORD_PRINT",
-	["runlua"] = "KEYWORD_RUN_LUA",
 	["runpython"] = "KEYWORD_RUN_PYTHON",
 	["if"]		= "KEYWORD_IF",
 	["then"]	  = "KEYWORD_THEN",

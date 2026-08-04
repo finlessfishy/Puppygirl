@@ -1,4 +1,4 @@
-local version = "0.9.5"
+local version = "0.9.8"
 
 local tokenizer = require("tokenizer")
 local parser = require("parser")
@@ -19,36 +19,41 @@ local function run_code(code, intro)
 		print("Running puppygirl " .. version)
 	end
 
-
-
 	local tokens = tokenizer.tokenize(code)
-
-	local has_lua = false
-	local has_python = false
-
-	for _, token in ipairs(tokens) do
-	    if token.type == "KEYWORD_RUN_LUA" then
-	        has_lua = true
-	    elseif token.type == "KEYWORD_RUN_PYTHON" then
-	        has_python = true
-	    end
-	end
-
-	if has_lua or has_python then
-		print()
-	    if has_lua then
-	    	print("\nWait!! There is Lua code execution in this game, so it might do dangerous things to your computer if the developer has bad intentions!")
-	    	io.write("\nPress enter to continue, but only if you trust the developer!!!\n")
-	    	io.read()
-	    end
-	    if has_python then
-	    	print("\nWait!! There is Python code execution in this game, so it might do dangerous things to your computer if the developer has bad intentions!")
-	    	io.write("\nPress enter to continue, but only if you trust the developer!!!\n")
-	    	io.read()
-	    end
-	end
-
 	local ast = parser.parse(tokens)
+
+	-- Scan the whole script for Python code BEFORE running anything
+	local python_snippets = interpreter.collect_python_code(ast)
+
+	if #python_snippets > 0 then
+		local combined = table.concat(python_snippets, "\n")
+		local tmp_name = os.tmpname()
+		local tmp_file = io.open(tmp_name, "w")
+		tmp_file:write(combined)
+		tmp_file:close()
+
+		local info = debug.getinfo(1, "S")
+		local lua_dir = info.source:match("@?(.*[/\\])") or "./"
+		local runcode_path = lua_dir .. "runcode.py"
+
+		local handle = io.popen('python3 -u "' .. runcode_path .. '" scan "' .. tmp_name .. '"')
+		local warnings = {}
+		for line in handle:lines() do
+			table.insert(warnings, line)
+		end
+		handle:close()
+		os.remove(tmp_name)
+
+		if #warnings > 0 then
+			print("\nPuppygirl warning: This script contains Python code that might try to do these things!!")
+			for _, w in ipairs(warnings) do
+				print("    - " .. w)
+			end
+			io.write("\nPress enter to continue, but only if you trust wherever you got this game from!!\nPress CTRL+C to quit.\n")
+			io.read()
+		end
+	end
+
 	local env = interpreter.run(ast)
 
 	return env
