@@ -15,7 +15,7 @@ else
 	woof "something else"
 goodgirl
 
-for x = 1, 3 do
+everytime x = 1, 3 do
 	woof x
 goodgirl
 
