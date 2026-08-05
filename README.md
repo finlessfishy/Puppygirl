@@ -2,7 +2,7 @@
 Puppygirl is a new programming language coded mainly in Lua, with its syntax inspired by languages like Python and Lua.
 Puppygirl is built primarily for creating terminal and CLI video games.
 
-Its syntax is very cute and cheerful, such as "woof" instead of print, and "goodgirl" instead of Lua's end.
+Its syntax is very cute and cheerful, such as `woof` instead of `print`, and `goodgirl` instead of Lua's `end`.
 
 ---
 
