@@ -26,9 +26,9 @@ For a more extensive guide, visit the Puppygirl wiki [Syntax guide](https://gith
 
 ---
 
-Latest version: 0.10.0
-
 Puppygirl is currently made of **958** lines of code!
+
+Latest version: **0.10.0**
 
 ---
 
