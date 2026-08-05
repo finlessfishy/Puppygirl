@@ -19,6 +19,8 @@ Its syntax is very cute and cheerful, such as "woof" instead of print, and "good
 - `everytime` (for loop)
 - `listen` (get user input)
 - `goodgirl` (end code block)
+- `trick` (create function)
+- `fetch` (return function)
 
 For a more extensive guide, visit the Puppygirl wiki [Syntax guide](https://github.com/finlessfishy/Puppygirl/wiki/Syntax-guide)
 
