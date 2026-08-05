@@ -160,6 +160,17 @@ function interpreter.run(ast)
 			return nil
 		elseif node.type == "ReturnStatement" then
 			return { __isReturn = true, value = evaluate(node.value, env) }
+		-- interpreter.lua inside evaluate(node, env)
+		elseif node.type == "AssignmentStatement" then
+		    local v = evaluate(node.value, env)
+		    if env[node.name] ~= nil then
+		        env[node.name] = v
+		    elseif global_env[node.name] ~= nil then
+		        global_env[node.name] = v
+		    else
+		        -- If it's not defined anywhere yet, create it in the local environment
+		        env[node.name] = v
+		    end
 		end
 	end
 

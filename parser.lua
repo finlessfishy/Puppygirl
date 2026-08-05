@@ -114,6 +114,7 @@ function parser.parse(tokens)
 
 
 	-- parse_statement(), add an else branch
+	-- parser.lua around line 118
 	parse_statement = function()
 	    local t = peek().type
 	    if t == "KEYWORD_VAR" then
@@ -132,6 +133,32 @@ function parser.parse(tokens)
 	        return parse_function_declaration()
 	    elseif t == "KEYWORD_FETCH" then
 	        return parse_return_statement()
+	    elseif t == "IDENTIFIER" then
+	        -- Look ahead at the next token to check what kind of statement this is!
+	        local name_token = advance()
+	        
+	        -- If it's followed by '(', it's a standalone function call (e.g. play_sound())
+	        if peek() and peek().type == "LPAREN" then
+	            advance() -- consume '('
+	            local args = {}
+	            if peek() and peek().type ~= "RPAREN" then
+	                table.insert(args, parse_expression())
+	                while peek() and peek().type == "COMMA" do
+	                    advance()
+	                    table.insert(args, parse_expression())
+	                end
+	            end
+	            match("RPAREN")
+	            return { type = "FunctionCall", name = name_token.value, args = args }
+	            
+	        -- If it's followed by '=', it's a variable re-assignment (e.g. msg = msg + "!")
+	        elseif peek() and peek().type == "EQUALS" then
+	            advance() -- consume '='
+	            local expr = parse_expression()
+	            return { type = "AssignmentStatement", name = name_token.value, value = expr }
+	        else
+	            error("Oops! Found identifier '" .. name_token.value .. "' but expected '(' or '='!")
+	        end
 	    else
 	        error("Oops! I found an unexpected token!! '" .. tostring(peek().value) ..
 	              "' (" .. t .. "), and I think it was at token " .. cursor .. "!")
@@ -183,22 +210,25 @@ function parser.parse(tokens)
 		elseif p.type == "KEYWORD_FALSE" then
 			advance()
 			return {type = "Literal", value = false}
+		-- parser.lua (inside parse_primary)
 		elseif p.type == "IDENTIFIER" then
-			advance()
-			if peek() and peek().type == "LPAREN" then
-				advance() -- consume '('
-				local args = {}
-				if peek() and peek().type ~= "RPAREN" then
-					table.insert(args, parse_expression())
-					while peek() and peek().type == "COMMA" do
-						advance()
-						table.insert(args, parse_expression())
-					end
-				end
-				match("RPAREN")
-				return { type = "FunctionCall", name = p.value, args = args }
-			end
-			return { type = "VariableAccess", name = p.value }
+		    local id_token = advance() -- Save the identifier token right here!
+		    
+		    if peek() and peek().type == "LPAREN" then
+		        advance() -- consume '('
+		        local args = {}
+		        if peek() and peek().type ~= "RPAREN" then
+		            table.insert(args, parse_expression())
+		            while peek() and peek().type == "COMMA" do
+		                advance()
+		                table.insert(args, parse_expression())
+		            end
+		        end
+		        match("RPAREN")
+		        -- Use id_token.value instead of p.value!
+		        return { type = "FunctionCall", name = id_token.value, args = args }
+		    end
+    return { type = "VariableAccess", name = id_token.value }
 		elseif p.type == "KEYWORD_LISTEN" then
 		    advance()
 		    local prompt = nil
