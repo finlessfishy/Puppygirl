@@ -43,4 +43,11 @@ make tstvar = greet("lyric")
 woof tstvar
 
 
+make gray_text = pg.colors.GRAY + "This text is gray!" + pg.colors.RESET
+woof gray_text
+
+make pink_bark = pg.colors.PINK + "Bark bark in pink!" + pg.colors.RESET
+woof pink_bark
+
+
 goodgirl

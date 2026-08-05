@@ -182,20 +182,20 @@ function parser.parse(tokens)
 	end
 
 	parse_expression = function()
-		primaryL = parse_primary()
+	    local expr = parse_primary()
 
-		local p = peek()
-		if not p or (p.value ~= "+" and p.value ~= "-" and p.value ~= "==" and p.value ~= "*") then
-		    return primaryL
-		else
-			op = peek()
+	    while peek() and (peek().value == "+" or peek().value == "-" or peek().value == "==" or peek().value == "*") do
+	        local op = advance()
+	        local right = parse_primary()
+	        expr = {
+	            type = "BinaryExpr",
+	            operator = op.value,
+	            left = expr,
+	            right = right
+	        }
+    	end
 
-			advance()
-
-			primaryR = parse_primary()
-
-			return {type = "BinaryExpr", operator = op.value, left = primaryL, right = primaryR}
-		end
+    	return expr
 	end
 
 	parse_primary = function()

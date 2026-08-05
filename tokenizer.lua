@@ -52,12 +52,21 @@ function tokenizer.tokenize(str)
 
 		-- 2. Numbers
 		elseif c:match("%d") then
-			local start = cursor
-			while cursor <= len and str:sub(cursor, cursor):match("%d") do
-				cursor = cursor + 1
-			end
-			local num_str = str:sub(start, cursor - 1)
-			table.insert(main_table, { type = "NUMBER", value = tonumber(num_str) })
+		    local start = cursor
+		    while cursor <= len and str:sub(cursor, cursor):match("%d") do
+		        cursor = cursor + 1
+		    end
+		    local num_str = str:sub(start, cursor - 1)
+		    table.insert(main_table, { type = "NUMBER", value = tonumber(num_str) })
+
+		-- 3. Identifiers & Keywords (allow dots for pg.colors.GRAY!)
+		elseif c:match("[%a_]") then
+		    local start = cursor
+		    while cursor <= len and str:sub(cursor, cursor):match("[%w_%.]") do
+		        cursor = cursor + 1
+		    end
+		    local word = str:sub(start, cursor - 1)
+		    table.insert(main_table, { type = KEYWORDS[word] or "IDENTIFIER", value = word })
 
 		-- 3. Identifiers & Keywords
 		elseif c:match("[%a_]") then

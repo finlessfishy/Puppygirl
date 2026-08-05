@@ -3,29 +3,29 @@ local interpreter = {}
 
 
 local function collect_python_code(ast, found)
-    found = found or {}
-    for _, node in ipairs(ast) do
-        if node.type == "PythonCode" then
-            if node.value.type == "Literal" then
-                table.insert(found, tostring(node.value.value))
-            end
-        elseif node.type == "IfStatement" then
-            collect_python_code(node.then_body, found)
-            for _, branch in ipairs(node.elseif_branches) do
-                collect_python_code(branch.body, found)
-            end
-            if node.else_body then
-                collect_python_code(node.else_body, found)
-            end
-        elseif node.type == "WhileStatement" then
-            collect_python_code(node.body, found)
-        elseif node.type == "ForStatement" then
-            collect_python_code(node.body, found)
-        elseif node.type == "FunctionDeclaration" then
-            collect_python_code(node.body, found)
-        end
-    end
-    return found
+	found = found or {}
+	for _, node in ipairs(ast) do
+		if node.type == "PythonCode" then
+			if node.value.type == "Literal" then
+				table.insert(found, tostring(node.value.value))
+			end
+		elseif node.type == "IfStatement" then
+			collect_python_code(node.then_body, found)
+			for _, branch in ipairs(node.elseif_branches) do
+				collect_python_code(branch.body, found)
+			end
+			if node.else_body then
+				collect_python_code(node.else_body, found)
+			end
+		elseif node.type == "WhileStatement" then
+			collect_python_code(node.body, found)
+		elseif node.type == "ForStatement" then
+			collect_python_code(node.body, found)
+		elseif node.type == "FunctionDeclaration" then
+			collect_python_code(node.body, found)
+		end
+	end
+	return found
 end
 
 interpreter.collect_python_code = collect_python_code
@@ -33,7 +33,23 @@ interpreter.collect_python_code = collect_python_code
 
 
 function interpreter.run(ast)
-	local global_env = {}
+	local global_env = {
+		pg = {
+			colors = {
+				RESET   = "\27[0m",
+				R   = "\27[0m",
+				RED	 = "\27[31m",
+				GREEN   = "\27[32m",
+				YELLOW  = "\27[33m",
+				BLUE	= "\27[34m",
+				MAGENTA = "\27[35m",
+				CYAN	= "\27[36m",
+				GRAY	= "\27[90m",
+				WHITE   = "\27[97m",
+				PINK	= "\27[38;5;218m",
+			}
+		}
+	}
 	local functions = {}
 
 	local evaluate, evaluate_block
@@ -58,13 +74,28 @@ function interpreter.run(ast)
 		if node.type == "Literal" then
 			return node.value
 		elseif node.type == "VariableAccess" then
-			if env[node.name] ~= nil then
-				return env[node.name]
-			elseif global_env[node.name] ~= nil then
-				return global_env[node.name]
-			else
-				error("Oh no, an error!!! Your variable isn't defined! '" .. node.name .. "'")
-			end
+		    local function resolve_path(path, env_table)
+		        local current = env_table
+		        for part in path:gmatch("[^%.]+") do
+		            if type(current) == "table" and current[part] ~= nil then
+		                current = current[part]
+		            else
+		                return nil
+		            end
+		        end
+		        return current
+		    end
+
+		    local val = resolve_path(node.name, env)
+		    if val == nil then
+		        val = resolve_path(node.name, global_env)
+		    end
+
+		    if val ~= nil then
+		        return val
+		    else
+		        error("Oh no, an error!!! Your variable isn't defined! '" .. node.name .. "'")
+		    end
 		elseif node.type == "BinaryExpr" then
 			local leftV = evaluate(node.left, env)
 			local rightV = evaluate(node.right, env)
@@ -88,23 +119,23 @@ function interpreter.run(ast)
 			local value = evaluate(node.value, env)
 			print(value)
 		elseif node.type == "PythonCode" then
-		    local py_code = evaluate(node.value, env)
+			local py_code = evaluate(node.value, env)
 
-		    local info = debug.getinfo(1, "S")
-		    local lua_dir = info.source:match("@?(.*[/\\])") or "./"
-		    local full_path = lua_dir .. "runcode.py"
+			local info = debug.getinfo(1, "S")
+			local lua_dir = info.source:match("@?(.*[/\\])") or "./"
+			local full_path = lua_dir .. "runcode.py"
 
-		    local tmp_name = os.tmpname()
-		    local tmp_file = io.open(tmp_name, "w")
-		    tmp_file:write(py_code)
-		    tmp_file:close()
+			local tmp_name = os.tmpname()
+			local tmp_file = io.open(tmp_name, "w")
+			tmp_file:write(py_code)
+			tmp_file:close()
 
-		    local handle = io.popen('python3 -u "' .. full_path .. '" run "' .. tmp_name .. '"')
-		    for line in handle:lines() do
-		        print(line)
-		    end
-		    handle:close()
-		    os.remove(tmp_name)
+			local handle = io.popen('python3 -u "' .. full_path .. '" run "' .. tmp_name .. '"')
+			for line in handle:lines() do
+				print(line)
+			end
+			handle:close()
+			os.remove(tmp_name)
 		elseif node.type == "IfStatement" then
 			if evaluate(node.condition, env) then
 				return evaluate_block(node.then_body, env)
@@ -132,10 +163,10 @@ function interpreter.run(ast)
 				if result then return result end
 			end
 		elseif node.type == "InputExpr" then
-		    if node.prompt then
-		        io.write(tostring(evaluate(node.prompt, env)))
-		    end
-		    return io.read("*l")
+			if node.prompt then
+				io.write(tostring(evaluate(node.prompt, env)))
+			end
+			return io.read("*l")
 		elseif node.type == "FunctionDeclaration" then
 			functions[node.name] = { params = node.params, body = node.body }
 		elseif node.type == "FunctionCall" then
@@ -148,11 +179,15 @@ function interpreter.run(ast)
 					" argument(s), but got " .. #node.args .. "!")
 			end
 
+			-- interpreter.lua (inside FunctionCall)
 			local call_env = {}
+			setmetatable(call_env, { __index = env }) -- Fallback to outer scope for reads
+
 			for i, pname in ipairs(func.params) do
-				call_env[pname] = evaluate(node.args[i], env)
+			    call_env[pname] = evaluate(node.args[i], env)
 			end
 
+			-- Pass call_env as the environment when evaluating the block!
 			local result = evaluate_block(func.body, call_env)
 			if result and result.__isReturn then
 				return result.value
@@ -161,14 +196,15 @@ function interpreter.run(ast)
 		elseif node.type == "ReturnStatement" then
 			return { __isReturn = true, value = evaluate(node.value, env) }
 		-- interpreter.lua inside evaluate(node, env)
+		-- interpreter.lua (inside AssignmentStatement)
 		elseif node.type == "AssignmentStatement" then
 		    local v = evaluate(node.value, env)
-		    if env[node.name] ~= nil then
+		    -- Check if key exists in current local env raw table or outer env
+		    if rawget(env, node.name) ~= nil or env[node.name] ~= nil then
 		        env[node.name] = v
 		    elseif global_env[node.name] ~= nil then
 		        global_env[node.name] = v
 		    else
-		        -- If it's not defined anywhere yet, create it in the local environment
 		        env[node.name] = v
 		    end
 		end
