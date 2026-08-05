@@ -35,4 +35,18 @@ end
 
 
 
+function is_windows()
+    local os_env = os.getenv("OS") or ""
+    local is_it_windows = os_env:match("^Windows") ~= nil
+
+    if is_it_windows then
+        return true
+    else
+        return false
+    end
+end
+
+
+
+
 return utilities

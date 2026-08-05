@@ -47,7 +47,40 @@ function interpreter.run(ast)
 				GRAY	= "\27[90m",
 				WHITE   = "\27[97m",
 				PINK	= "\27[38;5;218m",
-			}
+			},
+
+			terminal = {
+				clear = function()
+					io.write("\27[2J\27[H")
+            		io.flush()
+            	end,
+
+            	move_cursor = function(x, y)
+		            io.write(string.format("\27[%d;%dH", y or 1, x or 1))
+		            io.flush()
+		        end,
+
+		        hide_cursor = function()
+		            io.write("\27[?25l")
+		            io.flush()
+		        end,
+
+		        show_cursor = function()
+		            io.write("\27[?25h")
+		            io.flush()
+        		end,
+			},
+
+			game = {
+				random = function(min, max)
+		            return math.random(min, max)
+		        end,
+
+		        sleep = function(seconds)
+		            local sec = tonumber(seconds) or 0
+		            os.execute("sleep " .. sec) -- Use timeout/sleep depending on OS
+		        end,
+			},
 		}
 	}
 	local functions = {}
