@@ -32,5 +32,15 @@ goodgirl
 runpython "import os; os.system('echo hi')"
 
 
+trick greet(name) do
+    make msg = "Woof, " + name
+    msg = msg + "!"
+    woof msg
+    fetch yep
+goodgirl
+
+make tstvar = greet("lyric")
+woof tstvar
+
 
 goodgirl

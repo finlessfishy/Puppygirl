@@ -26,7 +26,7 @@ function parser.parse(tokens)
 
 
 
-	local parse_statement, parse_variable_declaration, parse_print_statement, parse_expression, parse_primary, parse_run_python
+	local parse_statement, parse_variable_declaration, parse_print_statement, parse_expression, parse_primary, parse_run_python, parse_function_declaration, parse_return_statement
 	local parse_block, parse_if, parse_while, parse_for
 
 
@@ -128,6 +128,10 @@ function parser.parse(tokens)
 	        return parse_while()
 	    elseif t == "KEYWORD_FOR" then
 	        return parse_for()
+	    elseif t == "KEYWORD_TRICK" then
+	        return parse_function_declaration()
+	    elseif t == "KEYWORD_FETCH" then
+	        return parse_return_statement()
 	    else
 	        error("Oops! I found an unexpected token!! '" .. tostring(peek().value) ..
 	              "' (" .. t .. "), and I think it was at token " .. cursor .. "!")
@@ -181,6 +185,19 @@ function parser.parse(tokens)
 			return {type = "Literal", value = false}
 		elseif p.type == "IDENTIFIER" then
 			advance()
+			if peek() and peek().type == "LPAREN" then
+				advance() -- consume '('
+				local args = {}
+				if peek() and peek().type ~= "RPAREN" then
+					table.insert(args, parse_expression())
+					while peek() and peek().type == "COMMA" do
+						advance()
+						table.insert(args, parse_expression())
+					end
+				end
+				match("RPAREN")
+				return { type = "FunctionCall", name = p.value, args = args }
+			end
 			return { type = "VariableAccess", name = p.value }
 		elseif p.type == "KEYWORD_LISTEN" then
 		    advance()
@@ -209,6 +226,34 @@ function parser.parse(tokens)
 		local expr = parse_expression()
 
 		return {type = "PythonCode", value = expr}
+	end
+
+	parse_function_declaration = function()
+		advance() -- consume 'trick'
+		local name_token = match("IDENTIFIER")
+		match("LPAREN")
+
+		local params = {}
+		if peek() and peek().type ~= "RPAREN" then
+			table.insert(params, match("IDENTIFIER").value)
+			while peek() and peek().type == "COMMA" do
+				advance()
+				table.insert(params, match("IDENTIFIER").value)
+			end
+		end
+		match("RPAREN")
+		match("KEYWORD_DO")
+
+		local body = parse_block({"KEYWORD_GOODGIRL"})
+		match("KEYWORD_GOODGIRL")
+
+		return { type = "FunctionDeclaration", name = name_token.value, params = params, body = body }
+	end
+
+	parse_return_statement = function()
+		advance() -- consume 'fetch'
+		local expr = parse_expression()
+		return { type = "ReturnStatement", value = expr }
 	end
 
 

@@ -13,6 +13,8 @@ local KEYWORDS = {
 	["goodgirl"] = "KEYWORD_GOODGIRL",
 	["yep"] = "KEYWORD_TRUE",
 	["nope"] = "KEYWORD_FALSE",
+	["trick"] = "KEYWORD_TRICK",
+	["fetch"] = "KEYWORD_FETCH",
 }
 
 local tokenizer = {}
@@ -92,6 +94,12 @@ function tokenizer.tokenize(str)
 			cursor = cursor + 1
 		elseif c == "," then
 			table.insert(main_table, { type = "COMMA", value = "," })
+			cursor = cursor + 1
+		elseif c == "(" then
+			table.insert(main_table, { type = "LPAREN", value = "(" })
+			cursor = cursor + 1
+		elseif c == ")" then
+			table.insert(main_table, { type = "RPAREN", value = ")" })
 			cursor = cursor + 1
 		else
 			error("I found an unexpected character!! Here it is: " .. c)

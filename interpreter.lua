@@ -21,6 +21,8 @@ local function collect_python_code(ast, found)
             collect_python_code(node.body, found)
         elseif node.type == "ForStatement" then
             collect_python_code(node.body, found)
+        elseif node.type == "FunctionDeclaration" then
+            collect_python_code(node.body, found)
         end
     end
     return found
@@ -31,26 +33,46 @@ interpreter.collect_python_code = collect_python_code
 
 
 function interpreter.run(ast)
-	local environment = {}
+	local global_env = {}
+	local functions = {}
 
-	local function evaluate(node)
+	local evaluate, evaluate_block
+
+	-- Runs a list of statements under `env`. If a `fetch` is hit (directly
+	-- or inside a nested if/while/for), returns { __isReturn = true, value = ... }
+	-- so callers can stop executing further statements/iterations.
+	-- Returns nil if the block finished normally with no return.
+	evaluate_block = function(body, env)
+		for _, stmt in ipairs(body) do
+			local result = evaluate(stmt, env)
+			if type(result) == "table" and result.__isReturn then
+				return result
+			end
+		end
+		return nil
+	end
+
+	evaluate = function(node, env)
+		env = env or global_env
+
 		if node.type == "Literal" then
 			return node.value
 		elseif node.type == "VariableAccess" then
-			if environment[node.name] ~= nil then
-				return environment[node.name]
+			if env[node.name] ~= nil then
+				return env[node.name]
+			elseif global_env[node.name] ~= nil then
+				return global_env[node.name]
 			else
 				error("Oh no, an error!!! Your variable isn't defined! '" .. node.name .. "'")
 			end
 		elseif node.type == "BinaryExpr" then
-			local leftV = evaluate(node.left)
-			local rightV = evaluate(node.right)
+			local leftV = evaluate(node.left, env)
+			local rightV = evaluate(node.right, env)
 
 			if node.operator == "+" then
 				if type(leftV) == "string" or type(rightV) == "string" then
 					return tostring(leftV) .. tostring(rightV)
 				end
-
 				return leftV + rightV
 			elseif node.operator == "-" then
 				return leftV - rightV
@@ -60,14 +82,13 @@ function interpreter.run(ast)
 				return leftV == rightV
 			end
 		elseif node.type == "VarDeclaration" then
-			local v = evaluate(node.value)
-			environment[node.name] = v
+			local v = evaluate(node.value, env)
+			env[node.name] = v
 		elseif node.type == "PrintStatement" then
-			local value = evaluate(node.value)
-
+			local value = evaluate(node.value, env)
 			print(value)
 		elseif node.type == "PythonCode" then
-		    local py_code = evaluate(node.value)
+		    local py_code = evaluate(node.value, env)
 
 		    local info = debug.getinfo(1, "S")
 		    local lua_dir = info.source:match("@?(.*[/\\])") or "./"
@@ -85,49 +106,68 @@ function interpreter.run(ast)
 		    handle:close()
 		    os.remove(tmp_name)
 		elseif node.type == "IfStatement" then
-			if evaluate(node.condition) then
-				for _, stmt in ipairs(node.then_body) do evaluate(stmt) end
+			if evaluate(node.condition, env) then
+				return evaluate_block(node.then_body, env)
 			else
-				local handled = false
 				for _, branch in ipairs(node.elseif_branches) do
-					if evaluate(branch.condition) then
-						for _, stmt in ipairs(branch.body) do evaluate(stmt) end
-						handled = true
-						break
+					if evaluate(branch.condition, env) then
+						return evaluate_block(branch.body, env)
 					end
 				end
-				if not handled and node.else_body then
-					for _, stmt in ipairs(node.else_body) do evaluate(stmt) end
+				if node.else_body then
+					return evaluate_block(node.else_body, env)
 				end
 			end
-
 		elseif node.type == "WhileStatement" then
-			while evaluate(node.condition) do
-				for _, stmt in ipairs(node.body) do evaluate(stmt) end
+			while evaluate(node.condition, env) do
+				local result = evaluate_block(node.body, env)
+				if result then return result end
 			end
-
 		elseif node.type == "ForStatement" then
-			local start_val = evaluate(node.start_expr)
-			local end_val = evaluate(node.end_expr)
+			local start_val = evaluate(node.start_expr, env)
+			local end_val = evaluate(node.end_expr, env)
 			for i = start_val, end_val do
-				environment[node.var_name] = i
-				for _, stmt in ipairs(node.body) do evaluate(stmt) end
+				env[node.var_name] = i
+				local result = evaluate_block(node.body, env)
+				if result then return result end
 			end
 		elseif node.type == "InputExpr" then
 		    if node.prompt then
-		        io.write(tostring(evaluate(node.prompt)))
+		        io.write(tostring(evaluate(node.prompt, env)))
 		    end
 		    return io.read("*l")
-		else
-    		return { type = "ExpressionStatement", value = parse_expression() }
+		elseif node.type == "FunctionDeclaration" then
+			functions[node.name] = { params = node.params, body = node.body }
+		elseif node.type == "FunctionCall" then
+			local func = functions[node.name]
+			if not func then
+				error("Oh no! I don't know any trick called '" .. node.name .. "'!")
+			end
+			if #node.args ~= #func.params then
+				error("Oh no! '" .. node.name .. "' expects " .. #func.params ..
+					" argument(s), but got " .. #node.args .. "!")
+			end
+
+			local call_env = {}
+			for i, pname in ipairs(func.params) do
+				call_env[pname] = evaluate(node.args[i], env)
+			end
+
+			local result = evaluate_block(func.body, call_env)
+			if result and result.__isReturn then
+				return result.value
+			end
+			return nil
+		elseif node.type == "ReturnStatement" then
+			return { __isReturn = true, value = evaluate(node.value, env) }
 		end
 	end
 
 	for _, statement in ipairs(ast) do
-		evaluate(statement)
+		evaluate(statement, global_env)
 	end
 
-	return environment
+	return global_env
 end
 
 
