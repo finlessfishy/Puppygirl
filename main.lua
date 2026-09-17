@@ -22,7 +22,6 @@ local function run_code(code, intro)
 	local tokens = tokenizer.tokenize(code)
 	local ast = parser.parse(tokens)
 
-	-- Scan the whole script for Python code BEFORE running anything
 	local python_snippets = interpreter.collect_python_code(ast)
 
 	if #python_snippets > 0 then
